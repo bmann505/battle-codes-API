@@ -9,11 +9,11 @@ module.exports = function(io) {
   // }
   io.on('connection', function(socket) {
     // once a client has connected, we expect to get a ping from them saying what room they want to join
-    console.log('made socket connection', socket.id);
+    // console.log('made socket connection', socket.id);
     socket.on('room', function(data) {
 
       socket.join(data.room);
-      console.log(data);
+      // console.log(data);
       io.in(data.room).emit('message', data);
     });
   });
