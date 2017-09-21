@@ -15,6 +15,7 @@ module.exports = function(io) {
       socket.join(data.room);
       // console.log(data);
       io.in(data.room).emit('message', data);
+      io.in(data.room).emit('timer', data);
     });
   });
 

@@ -13,6 +13,13 @@ function validAdmin(admin) {
   return validName && validEmail && validPassword;
 }
 
+router.get('/questions', (req, res, next) => {
+  knex('question')
+    .then(questions => {
+      res.json(questions)
+    })
+})
+
 router.get('/admin', (req, res, next) => {
   knex('admin')
     .then(admins => {
@@ -52,7 +59,6 @@ router.post('/signup', (req, res, next) => {
           knex('admin').insert(req.body).returning('*')
             .then(admin => {
               delete admin[0].password
-
               var token = jwt.sign(admin[0].id, process.env.TOKEN_SECRET);
               res.json({
                 data: token
@@ -72,27 +78,35 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.post('/signin', function(req, res, next) {
-  knex('admin').where('email', req.body.email)
-    .then(admin => {
-      if (admin.length === 0) {
-        res.json({
-          error: 'Email or password did not match'
-        })
-      } else {
-        var match = bcrypt.compareSync(req.body.password, admin[0].password)
-        if (match) {
-          delete admin[0].password
-          var token = jwt.sign(admin[0].id, process.env.TOKEN_SECRET);
-          res.json({
-            data: token
-          })
-        } else {
+  console.log(req.body.password)
+  if (req.body.email !== undefined || req.body.password !== undefined) {
+    knex('admin').where('email', req.body.email)
+      .then(admin => {
+        if (admin.length === 0) {
           res.json({
             error: 'Email or password did not match'
           })
+        } else {
+          var match = bcrypt.compareSync(req.body.password, admin[0].password)
+          if (match) {
+            delete admin[0].password
+            var token = jwt.sign(admin[0].id, process.env.TOKEN_SECRET);
+            res.json({
+              data: token
+            })
+          } else {
+            res.json({
+              error: 'Email or password did not match'
+            })
+          }
         }
-      }
+      })
+  } else {
+    res.json({
+      error: 'please enter an email'
     })
+  }
 });
 
 module.exports = router;
+s = router;
